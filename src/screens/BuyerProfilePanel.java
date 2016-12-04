@@ -18,6 +18,9 @@ public class BuyerProfilePanel extends JPanel
     private JTextField phoneTextField;
 
     private JButton editButton;
+    
+    private JTable historyTable;
+    private JScrollPane historyPane;
 
     public BuyerProfilePanel()
     {
@@ -68,10 +71,22 @@ public class BuyerProfilePanel extends JPanel
             }
         });
         
-        editButton.setMinimumSize(new Dimension(0, 50));
-        editButton.setPreferredSize(new Dimension(0, 50));
-        editButton.setMaximumSize(new Dimension(0, 50));
-
+        //TODO Retrieve buy history
+        String columns[] = {"Name", "Type", "Healthy" , "Price"};
+        
+        Object[][] data = {{"Kick Start", "Drink", "No", "1.00"}, 
+        				   {"Cheetos", "Chip" , "No" , "1.50"}};
+        				
+        historyTable = new JTable(data, columns);
+        historyTable.setPreferredScrollableViewportSize(new Dimension(500, 250));
+        historyTable.setFillsViewportHeight(true);
+        
+        historyPane = new JScrollPane(historyTable);
+        
+        editButton.setMinimumSize(new Dimension(15, 45));
+        editButton.setPreferredSize(new Dimension(15, 45));
+        editButton.setMaximumSize(new Dimension(15, 45));
+        
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints constraint = new GridBagConstraints();
 
@@ -86,9 +101,10 @@ public class BuyerProfilePanel extends JPanel
         constraint.fill = GridBagConstraints.HORIZONTAL;
         constraint.gridheight = 1;
         constraint.ipady = 0;
-        constraint.ipadx = 0;
-        constraint.gridx = 0;
-        constraint.gridy = 6;
+        constraint.ipadx = 50;
+        constraint.gridx = 3;
+        constraint.gridy = 0;
+        constraint.insets = new Insets(0, 5, -10, 5);
         panel.add(editButton, constraint);
         
         constraint.fill = GridBagConstraints.HORIZONTAL;
@@ -139,6 +155,15 @@ public class BuyerProfilePanel extends JPanel
         constraint.gridx = 2;
         constraint.gridy = 2;
         panel.add(phoneTextField, constraint);
+        
+        constraint.fill = GridBagConstraints.HORIZONTAL;
+        constraint.gridheight = 1;
+        constraint.gridwidth = 4;
+        constraint.ipady = 0;
+        constraint.ipadx = 0;
+        constraint.gridx = 0;
+        constraint.gridy = 7;
+        panel.add(historyPane, constraint);
 
         add(panel);
     }

@@ -12,7 +12,7 @@ public class Main
 //        LoginPanel loginPanel = new LoginPanel();
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 600);
+        frame.setSize(700, 600);
 
 //        frame.add(loginPanel, BorderLayout.CENTER);
         frame.add(profilePanel, BorderLayout.CENTER);
