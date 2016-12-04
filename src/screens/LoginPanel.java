@@ -6,15 +6,16 @@ import javax.swing.*;
 
 import java.net.URL;
 
-@SuppressWarnings("serial")
 public class LoginPanel extends JPanel
 {
-    private JLabel usernameLabel;
+	private static final long serialVersionUID = -8344005856624003659L;
+
+	private JLabel usernameLabel;
     private JLabel passwordLabel;
     private JLabel imageLabel;
 
     private JTextField usernameTextField;
-    private JTextField passwordTextField;
+    private JPasswordField passwordTextField;
 
     private JButton loginButton;
     private JButton signUpButton;
@@ -30,15 +31,19 @@ public class LoginPanel extends JPanel
         usernameLabel.setBackground(Color.WHITE);
 
         usernameTextField = new JTextField("");
-        passwordTextField = new JTextField("");
+        passwordTextField = new JPasswordField("");
 
         loginButton = new JButton(new AbstractAction("Login") 
         {
-            @Override
+			private static final long serialVersionUID = -4208271883744515611L;
+
+			@Override
             public void actionPerformed(ActionEvent actionEvent)
             {
+                @SuppressWarnings("deprecation")
+				
                 String username = usernameTextField.getText().trim();
-                String password = passwordTextField.getText().trim();
+				String password = passwordTextField.getText().trim();
 
                 if(username.equals("") || password.equals(""))
                 {
@@ -53,7 +58,9 @@ public class LoginPanel extends JPanel
 
         signUpButton = new JButton(new AbstractAction("Sign Up")
         {
-            @Override
+			private static final long serialVersionUID = -9203892257438133021L;
+
+			@Override
             public void actionPerformed(ActionEvent actionEvent)
             {
                 //Sign up code here
