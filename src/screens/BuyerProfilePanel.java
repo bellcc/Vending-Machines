@@ -46,10 +46,7 @@ public class BuyerProfilePanel extends JPanel
         {
             @Override
             public void actionPerformed(ActionEvent actionEvent)
-            {
-                //Toggle text field editability
-
-            	
+            {	
             	if(nameTextField.isEditable() == true)
             	{
                 	String name = nameTextField.getText();

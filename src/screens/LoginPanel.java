@@ -6,10 +6,9 @@ import javax.swing.*;
 
 import java.net.URL;
 
+@SuppressWarnings("serial")
 public class LoginPanel extends JPanel
 {
-	private static final long serialVersionUID = -8344005856624003659L;
-
 	private JLabel usernameLabel;
     private JLabel passwordLabel;
     private JLabel imageLabel;
@@ -38,10 +37,9 @@ public class LoginPanel extends JPanel
 			private static final long serialVersionUID = -4208271883744515611L;
 
 			@Override
-            public void actionPerformed(ActionEvent actionEvent)
+			@SuppressWarnings("deprecation")
+			public void actionPerformed(ActionEvent actionEvent)
             {
-                @SuppressWarnings("deprecation")
-				
                 String username = usernameTextField.getText().trim();
 				String password = passwordTextField.getText().trim();
 
