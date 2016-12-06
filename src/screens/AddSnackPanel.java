@@ -24,6 +24,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import tools.SQLHandler;
+
 @SuppressWarnings("serial")
 public class AddSnackPanel extends JPanel
 {
@@ -40,8 +42,12 @@ public class AddSnackPanel extends JPanel
 	
 	private JButton addButton;
 	
-	public AddSnackPanel()
+	private SQLHandler handler;
+	
+	public AddSnackPanel() throws ClassNotFoundException
 	{
+		handler = new SQLHandler();
+		
 		nameLabel = new JLabel("Name: ");
 		priceLabel = new JLabel("Price: ");
 		typeLabel = new JLabel("Type: ");
@@ -64,53 +70,22 @@ public class AddSnackPanel extends JPanel
             	String type = typeTextField.getText();
             	String healthy = (String) healthyComboBox.getSelectedItem();
             	
-            	String dbFilename = "project.db";
-            	
             	try
             	{
-					Class.forName("org.sqlite.JDBC");
+            		String retrieve = "SELECT MAX(Snack.SnackId) AS maxID FROM Snack";
+            		
+					ResultSet rs = handler.Query(retrieve);
+					int id = rs.getInt("maxID") + 1;
+					
+            		String insert = "INSERT INTO Snack VALUES (" + id + ", " + price + 
+            				        ", '" + type + "', '" + name + "', '" + healthy + "')";
+					
+					handler.Insert(insert);
 				}
-            	catch (ClassNotFoundException e)
+            	catch (SQLException e)
             	{
 					e.printStackTrace();
 				}
-            	
-            	Connection connection = null;
-            	
-            	try
-            	{
-            		String query = "SELECT MAX(Snack.SnackId) AS maxId FROM Snack";
-            		
-            		connection = DriverManager.getConnection("jdbc:sqlite:" + dbFilename);
-            		
-            		Statement statement = connection.createStatement();
-            		statement.setQueryTimeout(30);
-            		
-            		ResultSet rs = statement.executeQuery(query);
-            		int id = rs.getInt("maxId") + 1;
-            		
-            		String insert = "INSERT INTO Snack VALUES (" + id + ", " + price + ", '" + type + "', '" + name + "', '" + healthy + "')";
-            		statement.executeUpdate(insert);
-            		
-            	}
-            	catch(SQLException e)
-            	{
-            		System.out.println(e.getMessage());
-            	}
-            	finally
-            	{
-            		try
-            		{
-            			if (connection != null)
-            			{
-            				connection.close ();
-            			}
-            		}
-            		catch (SQLException e)
-            		{
-            			System.err.println (e);
-            		}
-            	}
             	
             	nameTextField.setText("");
             	priceTextField.setText("");

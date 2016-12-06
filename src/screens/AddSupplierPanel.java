@@ -47,7 +47,7 @@ public class AddSupplierPanel extends JPanel
             		String retrieve = "SELECT MAX(Supplier.SupplierId) AS maxID FROM Supplier";
             		
 					ResultSet rs = handler.Query(retrieve);
-					int id = rs.getInt("maxID");
+					int id = rs.getInt("maxID") + 1;
 					
             		String insert = "INSERT INTO Supplier VALUES ('" + name + "', " + id +")";
 					
@@ -57,6 +57,8 @@ public class AddSupplierPanel extends JPanel
             	{
 					e.printStackTrace();
 				}
+            	
+            	nameTextField.setText("");
             	
             }
         });
