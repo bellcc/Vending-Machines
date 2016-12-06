@@ -49,7 +49,7 @@ public class AddSupplierPanel extends JPanel
 					ResultSet rs = handler.Query(retrieve);
 					int id = rs.getInt("maxID") + 1;
 					
-            		String insert = "INSERT INTO Supplier VALUES ('" + name + "', " + id +")";
+            		String insert = "INSERT INTO Supplier VALUES (" + id + ", '" + name +"')";
 					
 					handler.Insert(insert);
 				}

@@ -10,7 +10,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -21,11 +20,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 
-import tools.SQLHandler;
-import tools.Supplier;
-
 @SuppressWarnings("serial")
-public class EditSupplierPanel extends JPanel
+public class tmp extends JPanel
 {
 	private JLabel supplierLabel;
 	private JLabel nameLabel;
@@ -50,14 +46,8 @@ public class EditSupplierPanel extends JPanel
 	private JPanel addSnackPanel;
 	private JPanel removeSnackPanel;
 	
-	private SQLHandler handler;
-	
-	private Supplier currentSupplier;
-	
-	public EditSupplierPanel() throws ClassNotFoundException
+	public tmp()
 	{
-		handler = new SQLHandler();
-		
 		panel = new JPanel(new GridBagLayout());
 		panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
         GridBagConstraints constraint = new GridBagConstraints();
@@ -65,15 +55,61 @@ public class EditSupplierPanel extends JPanel
 		supplierLabel = new JLabel("Supplier: ");
 		
 		supplierComboBox = new JComboBox<>();
-		updateSupplierComboBox();
-		updateCurrentSupplier();
+		
+    	String dbFilename = "project.db";
+    	
+    	try
+    	{
+			Class.forName("org.sqlite.JDBC");
+		}
+    	catch (ClassNotFoundException e)
+    	{
+			e.printStackTrace();
+		}
+    	
+    	Connection connection = null;
+    	
+    	try
+    	{
+    		String query = "SELECT Supplier.Name FROM Supplier";
+    		
+    		connection = DriverManager.getConnection("jdbc:sqlite:" + dbFilename);
+    		
+    		Statement statement = connection.createStatement();
+    		statement.setQueryTimeout(30);
+    		
+    		ResultSet rs = statement.executeQuery(query);
+
+    		while(rs.next())
+    		{
+    			supplierComboBox.addItem(rs.getString("Name"));
+    		}
+    		
+    	}
+    	catch(SQLException e)
+    	{
+    		System.out.println(e.getMessage());
+    	}
+    	finally
+    	{
+    		try
+    		{
+    			if (connection != null)
+    			{
+    				connection.close ();
+    			}
+    		}
+    		catch (SQLException e)
+    		{
+    			System.err.println (e);
+    		}
+    	}
 		
 		supplierComboBox.addActionListener(new ActionListener()
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
-		    	updateCurrentSupplier();
-		    	updateSupplierSnackComboBox();
+		    	updateSupplierSnacks((String) supplierComboBox.getSelectedItem());
 		    }
 		});
 		
@@ -104,17 +140,54 @@ public class EditSupplierPanel extends JPanel
             @Override
             public void actionPerformed(ActionEvent actionEvent)
             {
-            	String name = nameTextField.getText().trim();
+            	String name = nameTextField.getText();
+            	String supplier = (String) supplierComboBox.getSelectedItem();
             	
-            	String update = "UPDATE Supplier "
-						      + "SET Name = '" + name
-						      + "' WHERE SupplierId = " + currentSupplier.getId();
-				
-				handler.Insert(update);
-				
-				nameTextField.setText("");
-				
-				currentSupplier.setName(name);
+            	try
+            	{
+        			Class.forName("org.sqlite.JDBC");
+        		}
+            	catch (ClassNotFoundException e)
+            	{
+        			e.printStackTrace();
+        		}
+            	
+            	Connection connection = null;
+            	    	
+            	try
+            	{
+            		String query = "SELECT Supplier.SupplierId FROM Supplier WHERE Supplier.Name = '" + supplier + "'";
+            		
+            		connection = DriverManager.getConnection("jdbc:sqlite:" + dbFilename);
+            		
+            		Statement statement = connection.createStatement();
+            		statement.setQueryTimeout(30);
+            		
+            		ResultSet rs = statement.executeQuery(query);
+            		int id = rs.getInt("SupplierId");
+            		
+            		String update = "UPDATE Supplier SET Name = '" + name + "' WHERE SupplierId = " + id;
+            		statement.execute(update);
+            		
+            	}
+            	catch(SQLException e)
+            	{
+            		System.out.println(e.getMessage());
+            	}
+            	finally
+            	{
+            		try
+            		{
+            			if (connection != null)
+            			{
+            				connection.close ();
+            			}
+            		}
+            		catch (SQLException e)
+            		{
+            			System.err.println (e);
+            		}
+            	}
             }
         });
 		
@@ -153,7 +226,51 @@ public class EditSupplierPanel extends JPanel
         quantityTextField = new JTextField();
         
         allSnackComboBox = new JComboBox<>();
-        updateAllSnackComboBox();
+            	
+    	try
+    	{
+			Class.forName("org.sqlite.JDBC");
+		}
+    	catch (ClassNotFoundException e)
+    	{
+			e.printStackTrace();
+		}
+    	    	
+    	try
+    	{
+    		String query = "SELECT Snack.Name FROM Snack";
+    		
+    		connection = DriverManager.getConnection("jdbc:sqlite:" + dbFilename);
+    		
+    		Statement statement = connection.createStatement();
+    		statement.setQueryTimeout(30);
+    		
+    		ResultSet rs = statement.executeQuery(query);
+    		
+    		while(rs.next())
+    		{
+    			allSnackComboBox.addItem(rs.getString("Name"));
+    		}
+    		
+    	}
+    	catch(SQLException e)
+    	{
+    		System.out.println(e.getMessage());
+    	}
+    	finally
+    	{
+    		try
+    		{
+    			if (connection != null)
+    			{
+    				connection.close ();
+    			}
+    		}
+    		catch (SQLException e)
+    		{
+    			System.err.println (e);
+    		}
+    	}
         
 		addButton = new JButton(new AbstractAction("Add")
         {
@@ -164,6 +281,57 @@ public class EditSupplierPanel extends JPanel
             	String cost = costTextField.getText();
             	String quantity = quantityTextField.getText();
             	String snack = (String) allSnackComboBox.getSelectedItem();
+            	
+            	try
+            	{
+        			Class.forName("org.sqlite.JDBC");
+        		}
+            	catch (ClassNotFoundException e)
+            	{
+        			e.printStackTrace();
+        		}
+            	
+            	Connection connection = null;
+            	    	
+            	try
+            	{
+            		String query1 = "SELECT Supplier.SupplierId FROM Supplier WHERE Supplier.Name = '" + name + "'";
+            		String query2 = "SELECT Snack.SnackId FROM Snack WHERE Snack.Name = '" + snack + "'";
+            		connection = DriverManager.getConnection("jdbc:sqlite:" + dbFilename);
+            		
+            		Statement statement = connection.createStatement();
+            		statement.setQueryTimeout(30);
+            		
+            		ResultSet rs = statement.executeQuery(query1);
+            		int id = rs.getInt("SupplierId");
+            		System.out.println("ID: " + id);
+            		
+            		rs = statement.executeQuery(query2);
+            		int snackId = rs.getInt("SnackId");
+            		System.out.println("SNACKID: " + snackId);
+
+            		String query3 = "INSERT INTO Supplies VALUES (" + cost + ", " + quantity + ", " + id + ", " + snackId + ")";
+            		statement.execute(query3);
+            		
+            	}
+            	catch(SQLException e)
+            	{
+            		System.out.println(e.getMessage());
+            	}
+            	finally
+            	{
+            		try
+            		{
+            			if (connection != null)
+            			{
+            				connection.close ();
+            			}
+            		}
+            		catch (SQLException e)
+            		{
+            			System.err.println (e);
+            		}
+            	}
             }
         });
         
@@ -241,12 +409,63 @@ public class EditSupplierPanel extends JPanel
             	String name = (String) supplierComboBox.getSelectedItem();
             	String snack = (String) supplierSnackComboBox.getSelectedItem();
             	
+            	try
+            	{
+        			Class.forName("org.sqlite.JDBC");
+        		}
+            	catch (ClassNotFoundException e)
+            	{
+        			e.printStackTrace();
+        		}
+            	
+            	Connection connection = null;
+            	    	
+            	try
+            	{
+            		String query1 = "SELECT Supplier.SupplierId FROM Supplier WHERE Supplier.Name = '" + name + "'";
+            		String query2 = "SELECT Snack.SnackId FROM Snack WHERE Snack.Name = '" + snack + "'";
+            		connection = DriverManager.getConnection("jdbc:sqlite:" + dbFilename);
+            		
+            		Statement statement = connection.createStatement();
+            		statement.setQueryTimeout(30);
+            		
+            		ResultSet rs = statement.executeQuery(query1);
+            		int id = rs.getInt("SupplierId");
+            		System.out.println("Supplier Id: " + id);
+            		
+            		rs = statement.executeQuery(query2);
+            		int snackId = rs.getInt("SnackId");
+            		System.out.println("Snack Id: " + snackId);
+
+            		
+            		String query3 = "DELETE FROM Supplies WHERE Supplies.SupplierId = '" + id + "' AND Supplies.SnackId = '" + snackId + "'";
+            		statement.execute(query3);
+            		
+            	}
+            	catch(SQLException e)
+            	{
+            		System.out.println(e.getMessage());
+            	}
+            	finally
+            	{
+            		try
+            		{
+            			if (connection != null)
+            			{
+            				connection.close();
+            			}
+            		}
+            		catch (SQLException e)
+            		{
+            			System.err.println(e);
+            		}
+            	}
             }
         });
         		
         supplierSnackComboBox = new JComboBox<>();
-        updateSupplierSnackComboBox();
-        
+        updateSupplierSnacks((String) supplierComboBox.getSelectedItem());
+		        
         constraint.fill = GridBagConstraints.HORIZONTAL;
         constraint.gridwidth = 1;
         constraint.gridheight = 1;
@@ -303,111 +522,70 @@ public class EditSupplierPanel extends JPanel
         
 		add(panel);
 	}
-	
-	private void updateCurrentSupplier()
-	{
-		Supplier newSupplier;
-		
-    	try
-    	{
-    		String name = (String) supplierComboBox.getSelectedItem();    		
-    		String retrieve = "SELECT * "
-    				        + "FROM Supplier "
-    				        + "WHERE Supplier.Name = '" + name + "'";
-    		
-			ResultSet rs = handler.Query(retrieve);
-			int id = rs.getInt("SupplierId");
-			String supplierName = rs.getString("Name");
-			
-			newSupplier = new Supplier(id, supplierName);
-			this.currentSupplier = newSupplier;
 
-		}
-    	catch (SQLException e)
-    	{
-			e.printStackTrace();
-		}		
-	}
-
-	private void updateSupplierComboBox()
-	{	
-    	try
-    	{
-    		String retrieve = "SELECT Supplier.Name "
-    				        + "FROM Supplier";
-    		
-			ResultSet rs = handler.Query(retrieve);
-			
-			supplierComboBox.removeAllItems();			
-			
-			while(rs.next())
-			{
-				supplierComboBox.addItem(rs.getString("Name"));
-			}
-						
-		}
-    	catch (SQLException e)
-    	{
-			e.printStackTrace();
-		}
-	}
-	
-	private void updateAllSnackComboBox()
+	private void updateSupplierSnacks(String name)
 	{
+    	String dbFilename = "project.db";
+    	
     	try
     	{
-    		String retrieve = "SELECT Snack.Name "
-    				        + "FROM Snack";
-    		
-			ResultSet rs = handler.Query(retrieve);
-			
-			allSnackComboBox.removeAllItems();			
-			
-			while(rs.next())
-			{
-				allSnackComboBox.addItem(rs.getString("Name"));
-			}
-						
+			Class.forName("org.sqlite.JDBC");
 		}
-    	catch (SQLException e)
+    	catch (ClassNotFoundException e)
     	{
 			e.printStackTrace();
 		}
-	}
-	
-	private void updateSupplierSnackComboBox()
-	{
+    	
+    	Connection connection = null;
+    	
     	try
     	{
-    		String retrieve = "SELECT Supplies.SnackId "
-    				         + "FROM Supplies "
-    				         + "WHERE Supplies.SupplierId = " + currentSupplier.getId();
+    		String supplierId = "SELECT Supplier.SupplierId FROM Supplier WHERE Supplier.Name = '" + name + "'";
     		
-			ResultSet rs = handler.Query(retrieve);
-			
-			supplierSnackComboBox.removeAllItems();			
-			
-			ArrayList<Integer> nums = new ArrayList<>();
-			while(rs.next())
-			{
-				int id = rs.getInt("SnackId");
-				nums.add(id);
-			}
-			
-			for(int i=0;i<nums.size();i++)
-			{
-				retrieve = "SELECT Snack.Name "
-						 + "FROM Snack "
-						 + "WHERE Snack.SnackId = " + nums.get(i);
-				rs = handler.Query(retrieve);
-				
-				supplierSnackComboBox.addItem(rs.getString("Name"));
-			}
-						
-		}
-    	catch (SQLException e)
+    		connection = DriverManager.getConnection("jdbc:sqlite:" + dbFilename);
+    		
+    		Statement statement = connection.createStatement();
+    		statement.setQueryTimeout(30);
+    		
+    		ResultSet rs = statement.executeQuery(supplierId);
+    		int id = rs.getInt("SupplierId");
+    		
+    		String snackCount = "SELECT COUNT(Supplies.SnackId) AS snackCount FROM Supplies WHERE Supplies.SupplierId = '" + id + "'";
+    		rs = statement.executeQuery(snackCount);
+    		int count = rs.getInt("snackCount");
+    		
+    		String snackList = "SELECT Snack.Name FROM Snack INNER JOIN Supplies ON Snack.SnackId = Supplies.SnackId WHERE Supplies.SupplierId = '" + id + "'";
+    		rs = statement.executeQuery(snackList);
+    		
+    		String snacks[] = new String[count];
+    		
+    		supplierSnackComboBox.removeAllItems();
+    		
+    		while(rs.next())
+    		{
+    			supplierSnackComboBox.addItem(rs.getString("Name"));
+    		}
+    		    		
+    		System.out.println(snacks.length);
+    		
+    	}
+    	catch(SQLException e)
     	{
-			e.printStackTrace();
-		}
+    		System.out.println(e.getMessage());
+    	}
+    	finally
+    	{
+    		try
+    		{
+    			if (connection != null)
+    			{
+    				connection.close ();
+    			}
+    		}
+    		catch (SQLException e)
+    		{
+    			System.err.println (e);
+    		}
+    	}
 	}
 }

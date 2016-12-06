@@ -1,4 +1,5 @@
 package tools;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -22,10 +23,14 @@ public class SQLHandler {
 		}
 	}
 
-	public boolean Insert(String Statement) {
-		try {
-			state.executeUpdate(Statement);
-		} catch (SQLException e) {
+	public boolean Insert(String Statement)
+	{
+		try
+		{
+			state.execute(Statement);
+		}
+		catch (SQLException e)
+		{
 			e.printStackTrace();
 			return false;
 		}
@@ -33,12 +38,10 @@ public class SQLHandler {
 		return true;
 	}
 
-	public ResultSet Query(String target) throws SQLException {
+	public ResultSet Query(String target) throws SQLException
+	{
 		ResultSet result = null;
-
 		result = state.executeQuery(target);
-
 		return result;
-
 	}
 }
