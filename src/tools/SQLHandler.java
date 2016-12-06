@@ -1,16 +1,16 @@
-package screens;
+package tools;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class SQLhandler {
+public class SQLHandler {
 
 	Connection connect = null;
 	Statement state;
 
-	public SQLhandler() throws ClassNotFoundException {
+	public SQLHandler() throws ClassNotFoundException {
 		Class.forName("org.sqlite.JDBC");
 
 		try {

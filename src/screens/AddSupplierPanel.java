@@ -4,6 +4,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -29,8 +34,53 @@ public class AddSupplierPanel extends JPanel
             public void actionPerformed(ActionEvent actionEvent)
             {
             	String name = nameTextField.getText();
+            	String dbFilename = "project.db";
             	
-            	//TODO SQL Insert statement here
+            	try
+            	{
+					Class.forName("org.sqlite.JDBC");
+				}
+            	catch (ClassNotFoundException e)
+            	{
+					e.printStackTrace();
+				}
+            	
+            	Connection connection = null;
+            	
+            	try
+            	{
+            		String query = "SELECT MAX(Supplier.SupplierId) AS maxId FROM Supplier";
+            		
+            		connection = DriverManager.getConnection("jdbc:sqlite:" + dbFilename);
+            		
+            		Statement statement = connection.createStatement();
+            		statement.setQueryTimeout(30);
+            		
+            		ResultSet rs = statement.executeQuery(query);
+            		int id = rs.getInt("maxId") + 1;
+            		
+            		String insert = "INSERT INTO Supplier VALUES (" + id + ", '" + name + "')";
+            		statement.executeUpdate(insert);
+            		
+            	}
+            	catch(SQLException e)
+            	{
+            		System.out.println(e.getMessage());
+            	}
+            	finally
+            	{
+            		try
+            		{
+            			if (connection != null)
+            			{
+            				connection.close ();
+            			}
+            		}
+            		catch (SQLException e)
+            		{
+            			System.err.println (e);
+            		}
+            	}
             }
         });
 		

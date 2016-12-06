@@ -11,6 +11,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -20,49 +25,34 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 @SuppressWarnings("serial")
-public class AddSupplierSnackPanel extends JPanel
+public class AddSnackPanel extends JPanel
 {
 	private JLabel nameLabel;
 	private JLabel priceLabel;
 	private JLabel typeLabel;
 	private JLabel healthyLabel;
-	private JLabel costLabel;
-	private JLabel quantityLabel;
-	private JLabel supplierLabel;
 	
 	private JTextField nameTextField;
 	private JTextField priceTextField;
 	private JTextField typeTextField;
-	private JTextField costTextField;
-	private JTextField quantityTextField;
 	
-	private JComboBox healthyComboBox;
-	private JComboBox supplierComboBox;
+	private JComboBox<String> healthyComboBox;
 	
 	private JButton addButton;
 	
-	public AddSupplierSnackPanel()
+	public AddSnackPanel()
 	{
 		nameLabel = new JLabel("Name: ");
 		priceLabel = new JLabel("Price: ");
 		typeLabel = new JLabel("Type: ");
 		healthyLabel = new JLabel("Healthy: ");
-		costLabel = new JLabel("Cost: ");
-		quantityLabel = new JLabel("Quantity: ");
-		supplierLabel = new JLabel("Supplier: ");
 		
 		nameTextField = new JTextField();
 		priceTextField = new JTextField();
 		typeTextField = new JTextField();
-		costTextField = new JTextField();
-		quantityTextField = new JTextField();
 		
 		String isHealthy[] = {"Yes", "No"};
 		healthyComboBox = new JComboBox<>(isHealthy);
-		
-		//TODO Retrieval query for suppliers
-		String suppliers[] = {"You", "Me", "Her"};
-		supplierComboBox = new JComboBox<>(suppliers);
 		
 		addButton = new JButton(new AbstractAction("Add")
         {
@@ -70,14 +60,62 @@ public class AddSupplierSnackPanel extends JPanel
             public void actionPerformed(ActionEvent actionEvent)
             {	
             	String name = nameTextField.getText();
-            	double price = Double.parseDouble(priceTextField.getText());
+            	String price = priceTextField.getText();
             	String type = typeTextField.getText();
             	String healthy = (String) healthyComboBox.getSelectedItem();
-            	double cost = Double.parseDouble(costTextField.getText());
-            	double quantity = Double.parseDouble(quantityTextField.getText());
-            	String supplier = (String) supplierComboBox.getSelectedItem();
             	
-            	//TODO SQL Insert statement here
+            	String dbFilename = "project.db";
+            	
+            	try
+            	{
+					Class.forName("org.sqlite.JDBC");
+				}
+            	catch (ClassNotFoundException e)
+            	{
+					e.printStackTrace();
+				}
+            	
+            	Connection connection = null;
+            	
+            	try
+            	{
+            		String query = "SELECT MAX(Snack.SnackId) AS maxId FROM Snack";
+            		
+            		connection = DriverManager.getConnection("jdbc:sqlite:" + dbFilename);
+            		
+            		Statement statement = connection.createStatement();
+            		statement.setQueryTimeout(30);
+            		
+            		ResultSet rs = statement.executeQuery(query);
+            		int id = rs.getInt("maxId") + 1;
+            		
+            		String insert = "INSERT INTO Snack VALUES (" + id + ", " + price + ", '" + type + "', '" + name + "', '" + healthy + "')";
+            		statement.executeUpdate(insert);
+            		
+            	}
+            	catch(SQLException e)
+            	{
+            		System.out.println(e.getMessage());
+            	}
+            	finally
+            	{
+            		try
+            		{
+            			if (connection != null)
+            			{
+            				connection.close ();
+            			}
+            		}
+            		catch (SQLException e)
+            		{
+            			System.err.println (e);
+            		}
+            	}
+            	
+            	nameTextField.setText("");
+            	priceTextField.setText("");
+            	typeTextField.setText("");
+            	healthyComboBox.setSelectedItem("Yes");
             }
         });
 		
@@ -90,6 +128,7 @@ public class AddSupplierSnackPanel extends JPanel
         constraint.ipadx = 50;
         constraint.gridx = 0;
         constraint.gridy = 0;
+        constraint.insets = new Insets(5, 10, 5, 10);
         panel.add(nameLabel, constraint);
         
         constraint.fill = GridBagConstraints.HORIZONTAL;
@@ -151,57 +190,9 @@ public class AddSupplierSnackPanel extends JPanel
         constraint.fill = GridBagConstraints.HORIZONTAL;
         constraint.gridheight = 1;
         constraint.ipady = 25;
-        constraint.ipadx = 50;
-        constraint.gridx = 0;
-        constraint.gridy = 4;
-        panel.add(costLabel, constraint);
-        
-        constraint.fill = GridBagConstraints.HORIZONTAL;
-        constraint.gridheight = 1;
-        constraint.ipady = 25;
-        constraint.ipadx = 200;
-        constraint.gridx = 1;
-        constraint.gridy = 4;
-        panel.add(costTextField, constraint);
-        
-        constraint.fill = GridBagConstraints.HORIZONTAL;
-        constraint.gridheight = 1;
-        constraint.ipady = 25;
-        constraint.ipadx = 50;
-        constraint.gridx = 0;
-        constraint.gridy = 5;
-        panel.add(quantityLabel, constraint);
-        
-        constraint.fill = GridBagConstraints.HORIZONTAL;
-        constraint.gridheight = 1;
-        constraint.ipady = 25;
-        constraint.ipadx = 200;
-        constraint.gridx = 1;
-        constraint.gridy = 5;
-        panel.add(quantityTextField, constraint);
-        
-        constraint.fill = GridBagConstraints.HORIZONTAL;
-        constraint.gridheight = 1;
-        constraint.ipady = 25;
-        constraint.ipadx = 50;
-        constraint.gridx = 0;
-        constraint.gridy = 6;
-        panel.add(supplierLabel, constraint);
-        
-        constraint.fill = GridBagConstraints.HORIZONTAL;
-        constraint.gridheight = 1;
-        constraint.ipady = 25;
         constraint.ipadx = 200;
         constraint.gridx = 1;
         constraint.gridy = 6;
-        panel.add(supplierComboBox, constraint);
-        
-        constraint.fill = GridBagConstraints.HORIZONTAL;
-        constraint.gridheight = 1;
-        constraint.ipady = 25;
-        constraint.ipadx = 200;
-        constraint.gridx = 1;
-        constraint.gridy = 7;
         constraint.insets = new Insets(10, 0, 0, 0);
         panel.add(addButton, constraint);
         
