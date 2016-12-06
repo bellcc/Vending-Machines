@@ -6,7 +6,7 @@ import screens.*;
 
 public class Main
 {
-    public static void main(String [] args)
+    public static void main(String [] args) throws ClassNotFoundException
     {
         JFrame frame = new JFrame("Vending Machines");
         AdminPanel adminPanel = new AdminPanel();

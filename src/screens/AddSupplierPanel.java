@@ -4,6 +4,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -16,6 +17,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import tools.SQLHandler;
+
 @SuppressWarnings("serial")
 public class AddSupplierPanel extends JPanel
 {
@@ -23,8 +26,12 @@ public class AddSupplierPanel extends JPanel
 	private JTextField nameTextField;
 	private JButton addButton;
 	
-	public AddSupplierPanel()
+	private SQLHandler handler;
+	
+	public AddSupplierPanel() throws ClassNotFoundException
 	{
+		handler = new SQLHandler();
+		
 		nameLabel = new JLabel("Name: ");
 		nameTextField = new JTextField();
 		
@@ -34,53 +41,23 @@ public class AddSupplierPanel extends JPanel
             public void actionPerformed(ActionEvent actionEvent)
             {
             	String name = nameTextField.getText();
-            	String dbFilename = "project.db";
-            	
+
             	try
             	{
-					Class.forName("org.sqlite.JDBC");
+            		String retrieve = "SELECT MAX(Supplier.SupplierId) AS maxID FROM Supplier";
+            		
+					ResultSet rs = handler.Query(retrieve);
+					int id = rs.getInt("maxID");
+					
+            		String insert = "INSERT INTO Supplier VALUES ('" + name + "', " + id +")";
+					
+					handler.Insert(insert);
 				}
-            	catch (ClassNotFoundException e)
+            	catch (SQLException e)
             	{
 					e.printStackTrace();
 				}
             	
-            	Connection connection = null;
-            	
-            	try
-            	{
-            		String query = "SELECT MAX(Supplier.SupplierId) AS maxId FROM Supplier";
-            		
-            		connection = DriverManager.getConnection("jdbc:sqlite:" + dbFilename);
-            		
-            		Statement statement = connection.createStatement();
-            		statement.setQueryTimeout(30);
-            		
-            		ResultSet rs = statement.executeQuery(query);
-            		int id = rs.getInt("maxId") + 1;
-            		
-            		String insert = "INSERT INTO Supplier VALUES (" + id + ", '" + name + "')";
-            		statement.executeUpdate(insert);
-            		
-            	}
-            	catch(SQLException e)
-            	{
-            		System.out.println(e.getMessage());
-            	}
-            	finally
-            	{
-            		try
-            		{
-            			if (connection != null)
-            			{
-            				connection.close ();
-            			}
-            		}
-            		catch (SQLException e)
-            		{
-            			System.err.println (e);
-            		}
-            	}
             }
         });
 		

@@ -49,7 +49,6 @@ public class EditSupplierPanel extends JPanel
 	public EditSupplierPanel()
 	{
 		panel = new JPanel(new GridBagLayout());
-		//pane.setBorder(BorderFactory.createLineBorder(Color.black));
 		panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
         GridBagConstraints constraint = new GridBagConstraints();
         
